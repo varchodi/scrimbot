@@ -2,13 +2,7 @@ import { SupabaseVectorStore } from "langchain/vectorstores/supabase";
 import { OpenAIEmbeddings } from "langchain/embeddings/openai";
 import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter'
 import { createClient } from "@supabase/supabase-js";
-
-
-const sbApiKey = import.meta.env.VITE_SUPABASE_API_KEY
-const sbUrl = import.meta.env.VITE_SUPERBASE_URL
-const openAIApiKey = import.meta.env.VITE_OPENAI_API_KEY
-
-
+import { sbApiKey, sbUrl,openAIApiKey } from "../constants";
 
 export const start_db = async () => {
     try {

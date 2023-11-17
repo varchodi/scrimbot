@@ -1,27 +1,47 @@
-import './style.css'
-import typescriptLogo from './typescript.svg'
-import viteLogo from '/vite.svg'
-import { setupCounter } from './counter.ts'
-import { start_db } from './superbase/index.ts'
+import { openAIApiKey } from "./constants"
+import { PromptTemplate } from "langchain/prompts";
+import { ChatOpenAI } from "langchain/chat_models/openai"
+document.addEventListener('submit', (e) => {
+  e.preventDefault()
+  progressConversation()
+})
 
-document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
-  <div>
-    <a href="https://vitejs.dev" target="_blank">
-      <img src="${viteLogo}" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://www.typescriptlang.org/" target="_blank">
-      <img src="${typescriptLogo}" class="logo vanilla" alt="TypeScript logo" />
-    </a>
-    <h1>Vite + TypeScript</h1>
-    <div class="card">
-      <button id="counter" type="button"></button>
-    </div>
-    <p class="read-the-docs">
-      Click on the Vite and TypeScript logos to learn more
-    </p>
-  </div>
-`
+const llm = new ChatOpenAI({ openAIApiKey })
 
-setupCounter(document.querySelector<HTMLButtonElement>('#counter')!)
-//?? start
-start_db()
+// A string holding the phrasing of the prompt
+const standaloneQuestionTemplate ='translate this text into a standalone question :{text}';
+
+// A prompt created using PromptTemplate and the fromTemplate method
+const standaloneQuestionPrompt=PromptTemplate.fromTemplate(standaloneQuestionTemplate);
+
+// Take the standaloneQuestionPrompt and PIPE the model
+const standaloneQuestionChain=standaloneQuestionPrompt.pipe(llm);
+
+// Await the response when you INVOKE the chain. 
+// Remember to pass in a question.
+const response=await standaloneQuestionChain.invoke({text:"i wanted to get it but be caise i'm not sure , i may wanted to return them because i don't know any thing about return policy of ur shop"});
+
+console.log(response)
+
+// -------------------------------------------------------
+async function progressConversation() {
+  const userInput = document.getElementById('user-input') as HTMLInputElement
+  const chatbotConversation = document.getElementById('chatbot-conversation-container') as HTMLDivElement
+  const question = userInput?.value
+  userInput.value = ''
+
+  // add human message
+  const newHumanSpeechBubble = document.createElement('div') as HTMLDivElement
+  newHumanSpeechBubble.classList.add('speech', 'speech-human')
+  chatbotConversation?.appendChild(newHumanSpeechBubble)
+  newHumanSpeechBubble.textContent = question
+  chatbotConversation.scrollTop = chatbotConversation.scrollHeight
+
+  // add AI message
+  const newAiSpeechBubble = document.createElement('div')
+  newAiSpeechBubble.classList.add('speech', 'speech-ai')
+  chatbotConversation.appendChild(newAiSpeechBubble)
+  
+  newAiSpeechBubble.textContent = "cool";
+  chatbotConversation.scrollTop = chatbotConversation.scrollHeight
+}
